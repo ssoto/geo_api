@@ -3,13 +3,14 @@
 
 from flask import Flask
 
-from os import environ
+from geo_api.utils.common import instanciate_logger
 
-settings_module = environ.get('GEO_API_SETTINGS_MODULE')
-print(settings_module)
+LOGGER = instanciate_logger()
 
 app = Flask(__name__)
 
 @app.route('/')
 def hello_world():
     return 'Hello, World!'
+
+LOGGER.debug('App is up now')
