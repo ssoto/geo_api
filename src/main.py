@@ -1,23 +1,32 @@
 #! /usr/bin/python
 # -*- encode: UTF-8 -*-
 
+import dateutil.parser
 from flask import Flask, request, jsonify, Response
 
 from geo_api.utils.common import instanciate_logger
 from geo_api.resources.storage import (StationEntityManager,
                                        MeasureEntityManager,
                                        )
+from geo_api.resources.operations import (validate_agg,
+                                          MeasuresAggregator)
 
 LOGGER = instanciate_logger()
 
 app = Flask(__name__)
 
+# CRUDS
 station_em = StationEntityManager()
 measure_em = MeasureEntityManager()
+
+# Aggregate operations
+measures_agg = MeasuresAggregator()
+
 
 @app.route('/')
 def hello_world():
     return 'Hello, World!'
+
 
 # AIR_QUALITY
 
@@ -72,6 +81,27 @@ def create_measure():
         jsonify(result),
         status=500,
         mimetype='application/json'
+    )
+
+@app.route('/air_quality/aggregate_measure', methods=['GET'])
+def aggregate_measure():
+    if not request.method == 'GET':
+        # TODO: manage errors
+        return
+
+    body = request.get_json()
+
+    from_ts = dateutil.parser.parse(body['from'])
+    to_ts = dateutil.parser.parse(body['to'])
+    measure = body['measure']
+
+    agg = body['agg']
+    if not validate_agg(agg):
+        # TODO: manage errors
+        return
+
+    aggregated = measures_agg.aggregate_by_range(
+        from_ts, to_ts, agg, measure, agg
     )
 
 
