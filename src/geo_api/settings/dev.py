@@ -9,4 +9,4 @@ class Config(BaseConfig):
     DB_PORT = '5433'
     DB_USER = 'postgres'
     DB_PASSWORD = 'example'
-    DB_NAME = 'geo_db'
+    DB_NAME = 'Urbo'
